@@ -19,6 +19,7 @@ func getRelatedIngredients(db *sql.DB, names []string) ([]ingredient, error) {
 	return dbRowsToIngredient(rows), nil
 }
 
+/* Get rows of specified column given a list of ingredient names - randomly ordered */
 func getColByNames(db *sql.DB, colName string, ingrNames []string) (*sql.Rows, error) {
 	var query []string
 	var whereSelectors []string
@@ -35,6 +36,16 @@ func getColByNames(db *sql.DB, colName string, ingrNames []string) (*sql.Rows, e
 	query = append(query, whereStr)
 	query = append(query, "order by rand()");
 	return db.Query(strings.Join(query, " "))
+}
+
+/* Get ingredients specified with a specific type name. E.g meat, fish, etc. */
+func getIngredientsByType(db *sql.DB, typeName string) ([]ingredient, error) {
+	var query string = fmt.Sprintf(`select distinct name from recipes.ingredients where ingr_type = "%s"`, typeName)
+	rows,err := db.Query(query);
+	if err != nil {
+        return nil, err
+	}
+	return dbRowsToIngredient(rows), nil
 }
 
 func getTopIngredients(db *sql.DB) ([]ingredient, error) {

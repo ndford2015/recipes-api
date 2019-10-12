@@ -35,7 +35,22 @@ func (a *App) Initialize(user, password, dbname string) {
 func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/ingredients/related/", a.getIngredientChoiceResponse).Methods("GET")
 	a.Router.HandleFunc("/ingredients/top/", a.getTopIngredients).Methods("GET")
+	a.Router.HandleFunc("/ingredients/", a.getIngredientsByType).Methods("GET")
 	a.Router.HandleFunc("/recipes/", a.getRecipes).Methods("GET")
+}
+
+func (a *App) getIngredientsByType(w http.ResponseWriter, r *http.Request) {
+	typeFilter := r.URL.Query()["type"]
+	if (typeFilter == nil) {
+		respondWithError(w, http.StatusInternalServerError, "No ingredient type defined");
+		return 
+	}
+	ingredients, err := getIngredientsByType(a.DB, typeFilter[0])
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJSON(w, http.StatusOK, ingredients)
 }
 
 func (a *App) getTopIngredients(w http.ResponseWriter, r *http.Request) {
