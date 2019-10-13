@@ -40,7 +40,7 @@ func getColByNames(db *sql.DB, colName string, ingrNames []string) (*sql.Rows, e
 
 /* Get ingredients specified with a specific type name. E.g meat, fish, etc. */
 func getIngredientsByType(db *sql.DB, typeName string) ([]ingredient, error) {
-	var query string = fmt.Sprintf(`select distinct name from recipes.ingredients where ingr_type = "%s"`, typeName)
+	var query string = fmt.Sprintf(`select distinct name from recipes.ingredients where ingr_type = "%s" order by rand()`, typeName)
 	rows,err := db.Query(query);
 	if err != nil {
         return nil, err

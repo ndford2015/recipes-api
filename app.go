@@ -40,7 +40,7 @@ func (a *App) initializeRoutes() {
 }
 
 func (a *App) getIngredientsByType(w http.ResponseWriter, r *http.Request) {
-	typeFilter := r.URL.Query()["type"]
+	typeFilter := r.URL.Query()["ingr_type"]
 	if (typeFilter == nil) {
 		respondWithError(w, http.StatusInternalServerError, "No ingredient type defined");
 		return 
