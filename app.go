@@ -63,9 +63,18 @@ func (a *App) getTopIngredients(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) getRecipes(w http.ResponseWriter, r *http.Request) {
+	numRecipes := r.URL.Query()["numRecipes"]
+	if len(numRecipes) > 0 {
+		recipes, err := getRandomRecipes(a.DB, numRecipes[0]);
+		getRecipeResponse(w, recipes, err)
+		return
+	}
 	ids := r.URL.Query()["id"]
 	recipes, err := getRecipes(a.DB, ids)
-	log.Println(ids)
+	getRecipeResponse(w, recipes, err)
+}
+
+func getRecipeResponse(w http.ResponseWriter, recipes []recipe, err error) {
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return

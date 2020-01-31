@@ -31,13 +31,13 @@ func getRecipeIds(db *sql.DB, names []string) ([]string, error){
 	return recipeIds, nil
 }
 
-func getRecipes(db *sql.DB, ids []string) ([]recipe, error){
-	var whereSelectors []string
-	for _,value := range ids {
-		whereSelectors = append(whereSelectors, fmt.Sprintf(`"%s"`, value))
-	}
-	query := fmt.Sprintf("select * from recipes.recipes where id in (%s)", strings.Join(whereSelectors, ","))
+func getRandomRecipes(db *sql.DB, numRecipes string) ([]recipe, error) {
+	query := fmt.Sprintf("select * from recipes.recipes order by rand() limit %s", numRecipes)
 	rows, err := db.Query(query)
+	return formatRecipes(rows, err)
+}
+
+func formatRecipes(rows *sql.Rows, err error) ([]recipe, error) {
 	if err != nil {
         return nil, err
 	}
@@ -50,4 +50,15 @@ func getRecipes(db *sql.DB, ids []string) ([]recipe, error){
 		recipes = append(recipes, r)
 	}
 	return recipes, err
+}
+
+func getRecipes(db *sql.DB, ids []string) ([]recipe, error){
+	var whereSelectors []string
+	for _,value := range ids {
+		whereSelectors = append(whereSelectors, fmt.Sprintf(`"%s"`, value))
+	}
+	query := fmt.Sprintf("select * from recipes.recipes where id in (%s)", strings.Join(whereSelectors, ","))
+	rows, err := db.Query(query)
+	
+	return formatRecipes(rows, err)
 }
