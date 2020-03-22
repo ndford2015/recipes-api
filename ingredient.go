@@ -23,11 +23,11 @@ func getRelatedIngredients(db *sql.DB, names []string) ([]ingredient, error) {
 func getColByNames(db *sql.DB, colName string, ingrNames []string) (*sql.Rows, error) {
 	var query []string
 	var whereSelectors []string
-	var selectStr string = fmt.Sprintf("select distinct base.%s from recipes.ingredients base", colName)
+	var selectStr string = fmt.Sprintf("select distinct base.%s from recipes.ingredients_v2 base", colName)
 	query = append(query, selectStr)
 	for index, value := range ingrNames {
 		var innerJoin string = fmt.Sprintf(
-			`inner join (select name, recipe_id from recipes.ingredients where name = "%s") t%d on base.recipe_id = t%d.recipe_id`, value, index, index)
+			`inner join (select name, recipe_id from recipes.ingredients_v2 where name = "%s") t%d on base.recipe_id = t%d.recipe_id`, value, index, index)
 		query = append(query, innerJoin)
 		whereSelectors = append(whereSelectors, fmt.Sprintf(`"%s"`, value))
 	}
@@ -40,7 +40,7 @@ func getColByNames(db *sql.DB, colName string, ingrNames []string) (*sql.Rows, e
 
 /* Get ingredients specified with a specific type name. E.g meat, fish, etc. */
 func getIngredientsByType(db *sql.DB, typeName string) ([]ingredient, error) {
-	var query string = fmt.Sprintf(`select distinct name from recipes.ingredients where ingr_type = "%s" order by rand()`, typeName)
+	var query string = fmt.Sprintf(`select distinct name from recipes.ingredients_v2 where ingr_type = "%s" order by rand()`, typeName)
 	rows,err := db.Query(query);
 	if err != nil {
         return nil, err
@@ -49,7 +49,7 @@ func getIngredientsByType(db *sql.DB, typeName string) ([]ingredient, error) {
 }
 
 func getTopIngredients(db *sql.DB) ([]ingredient, error) {
-	var query string = "select name from recipes.ingredients group by name having count(*) > 50 order by rand()"
+	var query string = "select name from recipes.ingredients_v2 group by name having count(*) > 25 order by rand()"
 	rows,err := db.Query(query);
 	if err != nil {
         return nil, err
